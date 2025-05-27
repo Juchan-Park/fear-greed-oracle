@@ -5,6 +5,11 @@ const nextConfig = {
   // Disable app directory completely
   experimental: {},
   reactStrictMode: true,
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  },
   swcMinify: true,
   async headers() {
     return [
