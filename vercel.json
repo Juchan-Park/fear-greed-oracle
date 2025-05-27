@@ -1,13 +1,4 @@
 {
-  "functions": {
-    "src/pages/api/*.js": {
-      "runtime": "nodejs18.x"
-    },
-    "src/pages/api/manifest.js": {
-      "runtime": "nodejs18.x",
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
     {
       "source": "/.well-known/farcaster.json",

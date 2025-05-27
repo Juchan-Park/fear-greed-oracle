@@ -13,17 +13,17 @@ export default function handler(req, res) {
   const manifest = {
     accountAssociation: {
       header: "eyJmaWQiOjEyMzQ1LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9",
-      payload: "eyJkb21haW4iOiJmZWFyLWdyZWVkLW9yYWNsZS1ybTBjeDRlemMtMHhkYXZlcy1wcm9qZWN0cy52ZXJjZWwuYXBwIn0",
+      payload: "eyJkb21haW4iOiJmZWFyLWdyZWVkLW9yYWNsZS1jMHdqZjdyM3MtMHhkYXZlcy1wcm9qZWN0cy52ZXJjZWwuYXBwIn0",
       signature: "MHg..."
     },
     frame: {
       version: "1",
       name: "Fear & Greed Oracle",
-      iconUrl: "https://fear-greed-oracle-rm0cx4ezc-0xdaves-projects.vercel.app/icon.png",
-      splashImageUrl: "https://fear-greed-oracle-rm0cx4ezc-0xdaves-projects.vercel.app/splash.png",
+      iconUrl: "https://fear-greed-oracle-c0wjf7r3s-0xdaves-projects.vercel.app/icon.png",
+      splashImageUrl: "https://fear-greed-oracle-c0wjf7r3s-0xdaves-projects.vercel.app/splash.png",
       splashBackgroundColor: "#1a1b23",
-      homeUrl: "https://fear-greed-oracle-rm0cx4ezc-0xdaves-projects.vercel.app",
-      webhookUrl: "https://fear-greed-oracle-rm0cx4ezc-0xdaves-projects.vercel.app/api/webhook"
+      homeUrl: "https://fear-greed-oracle-c0wjf7r3s-0xdaves-projects.vercel.app",
+      webhookUrl: "https://fear-greed-oracle-c0wjf7r3s-0xdaves-projects.vercel.app/api/webhook"
     },
     capabilities: {
       solana: {
