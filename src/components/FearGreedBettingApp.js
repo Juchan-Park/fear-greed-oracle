@@ -187,19 +187,21 @@ const FearGreedBettingApp = () => {
     <div 
       style={{
         minHeight: '100vh',
+        height: '100%',
         background: 'linear-gradient(135deg, #581c87 0%, #1e3a8a 50%, #312e81 100%)',
         color: 'white',
-        padding: '16px'
+        padding: '16px',
+        paddingBottom: '32px'
       }}
     >
-      <div style={{ maxWidth: '448px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '448px', margin: '0 auto', minHeight: 'calc(100vh - 32px)' }}>
         {/* 헤더 */}
         <div style={{ textAlign: 'center', padding: '16px 0' }}>
           <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px' }}>Fear &amp; Greed Oracle</h1>
           <p style={{ fontSize: '14px', opacity: 0.8 }}>Predict Bitcoin&apos;s Fear &amp; Greed Index</p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '16px' }}>
           {/* 카운트다운 */}
           <div 
             style={{
