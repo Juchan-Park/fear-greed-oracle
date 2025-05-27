@@ -106,8 +106,8 @@ export default function FearGreedBettingApp() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white">
       {/* Header */}
       <header className="text-center py-6 px-4">
-        <h1 className="text-2xl font-bold mb-2">Fear & Greed Oracle</h1>
-        <p className="text-purple-200 text-sm">Predict Bitcoin's Fear & Greed Index</p>
+        <h1 className="text-2xl font-bold mb-2">Fear &amp; Greed Oracle</h1>
+        <p className="text-purple-200 text-sm">Predict Bitcoin&apos;s Fear &amp; Greed Index</p>
       </header>
 
       <main className="max-w-md mx-auto px-4 space-y-4">
@@ -130,7 +130,7 @@ export default function FearGreedBettingApp() {
 
         {/* Current Fear & Greed Index */}
         <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-600/30">
-          <h2 className="text-center text-purple-200 mb-4">Current Fear & Greed Index</h2>
+          <h2 className="text-center text-purple-200 mb-4">Current Fear &amp; Greed Index</h2>
           
           {fearGreedIndex && (
             <div className="text-center">
@@ -249,7 +249,7 @@ export default function FearGreedBettingApp() {
 
       {/* Footer */}
       <footer className="mt-8 py-4 text-center">
-        <p className="text-xs text-purple-300">Powered by Solana • Built for Farcaster</p>
+        <p className="text-xs text-purple-300">Powered by Solana &bull; Built for Farcaster</p>
       </footer>
     </div>
   );
