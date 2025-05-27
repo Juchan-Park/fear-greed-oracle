@@ -88,14 +88,26 @@ export default function FearGreedBettingApp() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center">
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #3730a3 100%)',
+          color: 'white'
+        }}
+      >
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-400"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white p-4">
+    <div 
+      className="min-h-screen text-white p-4"
+      style={{
+        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #3730a3 100%)',
+        color: 'white'
+      }}
+    >
       {/* Header */}
       <header className="text-center py-6">
         <h1 className="text-3xl font-bold mb-2">Fear &amp; Greed Oracle</h1>
@@ -104,7 +116,13 @@ export default function FearGreedBettingApp() {
 
       <main className="max-w-md mx-auto space-y-4">
         {/* Settlement Countdown */}
-        <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+        <div 
+          className="backdrop-blur-sm rounded-2xl p-6 border"
+          style={{
+            backgroundColor: 'rgba(30, 41, 59, 0.8)',
+            borderColor: 'rgba(71, 85, 105, 0.5)'
+          }}
+        >
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-3">
               <div className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
@@ -112,7 +130,10 @@ export default function FearGreedBettingApp() {
               </div>
               <span className="text-white text-lg">Settlement in</span>
             </div>
-            <div className="text-4xl font-bold text-cyan-400">
+            <div 
+              className="text-4xl font-bold"
+              style={{ color: '#22d3ee' }}
+            >
               {String(countdown.hours).padStart(2, '0')}:
               {String(countdown.minutes).padStart(2, '0')}:
               {String(countdown.seconds).padStart(2, '0')}
@@ -121,19 +142,31 @@ export default function FearGreedBettingApp() {
         </div>
 
         {/* Current Fear & Greed Index */}
-        <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+        <div 
+          className="backdrop-blur-sm rounded-2xl p-6 border"
+          style={{
+            backgroundColor: 'rgba(30, 41, 59, 0.8)',
+            borderColor: 'rgba(71, 85, 105, 0.5)'
+          }}
+        >
           <h2 className="text-center text-white text-xl mb-6">Current Fear &amp; Greed Index</h2>
           
           {fearGreedIndex && (
             <div className="text-center">
-              <div className="text-8xl font-bold text-yellow-400 mb-2">
+              <div 
+                className="text-8xl font-bold mb-2"
+                style={{ color: '#fbbf24' }}
+              >
                 {fearGreedIndex.value}
               </div>
-              <div className="text-2xl font-semibold text-yellow-400 mb-4">
+              <div 
+                className="text-2xl font-semibold mb-4"
+                style={{ color: '#fbbf24' }}
+              >
                 {fearGreedIndex.classification}
               </div>
               
-              <div className="flex items-center justify-center gap-2 text-sm text-red-400 mb-6">
+              <div className="flex items-center justify-center gap-2 text-sm mb-6" style={{ color: '#f87171' }}>
                 <span>📉</span>
                 <span>Updated: {fearGreedIndex.lastUpdated}</span>
               </div>
@@ -142,15 +175,21 @@ export default function FearGreedBettingApp() {
               <div className="mb-3">
                 <WaveChart />
               </div>
-              <div className="text-sm text-gray-400">30-day trend</div>
+              <div className="text-sm" style={{ color: '#9ca3af' }}>30-day trend</div>
             </div>
           )}
         </div>
 
         {/* Live Bets */}
-        <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-700/50">
+        <div 
+          className="backdrop-blur-sm rounded-2xl p-4 border"
+          style={{
+            backgroundColor: 'rgba(30, 41, 59, 0.8)',
+            borderColor: 'rgba(71, 85, 105, 0.5)'
+          }}
+        >
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-cyan-400">📊</span>
+            <span style={{ color: '#22d3ee' }}>📊</span>
             <h3 className="text-xl font-semibold">Live Bets</h3>
           </div>
           
@@ -158,12 +197,12 @@ export default function FearGreedBettingApp() {
             {liveBets.map((bet, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-400 text-sm">{bet.address}</span>
-                  <span className="text-green-400 text-sm">📈</span>
+                  <span className="text-sm" style={{ color: '#9ca3af' }}>{bet.address}</span>
+                  <span className="text-sm" style={{ color: '#34d399' }}>📈</span>
                 </div>
                 <div className="text-right">
                   <div className="text-white font-semibold">{bet.amount}</div>
-                  <div className="text-gray-400 text-xs">{bet.time}</div>
+                  <div className="text-xs" style={{ color: '#9ca3af' }}>{bet.time}</div>
                 </div>
               </div>
             ))}
@@ -171,18 +210,24 @@ export default function FearGreedBettingApp() {
         </div>
 
         {/* Bet Amount Selection */}
-        <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-700/50">
+        <div 
+          className="backdrop-blur-sm rounded-2xl p-4 border"
+          style={{
+            backgroundColor: 'rgba(30, 41, 59, 0.8)',
+            borderColor: 'rgba(71, 85, 105, 0.5)'
+          }}
+        >
           <h3 className="text-center text-white text-xl mb-4">Bet Amount (SOL)</h3>
           <div className="grid grid-cols-3 gap-3">
             {[0.01, 0.05, 0.1].map((amount) => (
               <button
                 key={amount}
                 onClick={() => setBetAmount(amount)}
-                className={`py-4 px-4 rounded-xl font-bold text-lg transition-all ${
-                  betAmount === amount
-                    ? 'bg-cyan-500 text-black'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
-                }`}
+                className="py-4 px-4 rounded-xl font-bold text-lg transition-all"
+                style={{
+                  backgroundColor: betAmount === amount ? '#06b6d4' : '#374151',
+                  color: betAmount === amount ? '#000' : '#fff'
+                }}
               >
                 {amount} SOL
               </button>
@@ -194,30 +239,34 @@ export default function FearGreedBettingApp() {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setPrediction('up')}
-            className={`bg-gradient-to-br from-teal-600 to-teal-700 rounded-2xl p-6 border-2 transition-all ${
-              prediction === 'up' ? 'border-teal-400' : 'border-teal-600/50'
-            }`}
+            className="rounded-2xl p-6 border-2 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+              borderColor: prediction === 'up' ? '#2dd4bf' : 'rgba(13, 148, 136, 0.5)'
+            }}
           >
-            <div className="text-teal-200 text-sm mb-2 flex items-center gap-1">
+            <div className="text-sm mb-2 flex items-center gap-1" style={{ color: '#a7f3d0' }}>
               <span>📈</span>
               <span>UP Pool</span>
             </div>
             <div className="text-3xl font-bold text-white mb-2">2.99 SOL</div>
-            <div className="text-teal-200 text-sm">Odds: 0.65x</div>
+            <div className="text-sm" style={{ color: '#a7f3d0' }}>Odds: 0.65x</div>
           </button>
 
           <button
             onClick={() => setPrediction('down')}
-            className={`bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-6 border-2 transition-all ${
-              prediction === 'down' ? 'border-purple-400' : 'border-purple-600/50'
-            }`}
+            className="rounded-2xl p-6 border-2 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+              borderColor: prediction === 'down' ? '#a855f7' : 'rgba(124, 58, 237, 0.5)'
+            }}
           >
-            <div className="text-purple-200 text-sm mb-2 flex items-center gap-1">
+            <div className="text-sm mb-2 flex items-center gap-1" style={{ color: '#ddd6fe' }}>
               <span>📉</span>
               <span>DOWN Pool</span>
             </div>
             <div className="text-3xl font-bold text-white mb-2">1.94 SOL</div>
-            <div className="text-purple-200 text-sm">Odds: 1.54x</div>
+            <div className="text-sm" style={{ color: '#ddd6fe' }}>Odds: 1.54x</div>
           </button>
         </div>
 
@@ -225,13 +274,25 @@ export default function FearGreedBettingApp() {
         {connected ? (
           prediction && (
             <button
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 py-4 rounded-2xl font-bold text-xl transition-all border border-purple-500/50"
+              className="w-full py-4 rounded-2xl font-bold text-xl transition-all border"
+              style={{
+                background: 'linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%)',
+                borderColor: 'rgba(124, 58, 237, 0.5)',
+                color: 'white'
+              }}
             >
               Place Bet ({betAmount} SOL)
             </button>
           )
         ) : (
-          <button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 py-4 rounded-2xl font-bold text-xl transition-all border border-purple-500/50 flex items-center justify-center gap-3">
+          <button 
+            className="w-full py-4 rounded-2xl font-bold text-xl transition-all border flex items-center justify-center gap-3"
+            style={{
+              background: 'linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%)',
+              borderColor: 'rgba(124, 58, 237, 0.5)',
+              color: 'white'
+            }}
+          >
             <span>🔗</span>
             <span>Connect Solana Wallet</span>
           </button>
