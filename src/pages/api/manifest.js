@@ -1,0 +1,54 @@
+export default function handler(req, res) {
+  if (req.method === 'GET') {
+    const manifest = {
+      "accountAssociation": {
+        "header": "생성_필요",
+        "payload": "생성_필요", 
+        "signature": "생성_필요"
+      },
+      "frame": {
+        "version": "1",
+        "name": "Fear & Greed Oracle",
+        "homeUrl": "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app",
+        "iconUrl": "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/icon.png",
+        "splashImageUrl": "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/splash.png",
+        "splashBackgroundColor": "#1e1b4b",
+        "subtitle": "Bitcoin prediction betting",
+        "description": "Predict Bitcoin's Fear & Greed Index direction and earn SOL rewards through smart betting pools with real-time odds.",
+        "screenshotUrls": [
+          "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/screenshots/screenshot1.png",
+          "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/screenshots/screenshot2.png",
+          "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/screenshots/screenshot3.png"
+        ],
+        "primaryCategory": "finance",
+        "tags": [
+          "bitcoin",
+          "prediction",
+          "solana",
+          "defi",
+          "betting"
+        ],
+        "heroImageUrl": "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/hero.png",
+        "tagline": "Predict. Bet. Earn.",
+        "ogTitle": "Fear & Greed Oracle",
+        "ogDescription": "Predict Bitcoin's Fear & Greed Index and earn SOL rewards",
+        "ogImageUrl": "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/hero.png",
+        "requiredChains": [
+          "solana:mainnet"
+        ],
+        "requiredCapabilities": [
+          "wallet.getSolanaProvider",
+          "wallet.signAndSendTransaction"
+        ],
+        "webhookUrl": "https://fear-greed-oracle-e5hh4l3p6-0xdaves-projects.vercel.app/api/webhook"
+      }
+    };
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(200).json(manifest);
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
+  }
+} 
