@@ -10,15 +10,30 @@ export default function FearGreedBettingApp() {
   const [prediction, setPrediction] = useState(null);
 
   useEffect(() => {
-    // Simulate Fear & Greed Index data
-    const mockData = {
-      value: 42,
-      classification: "Fear",
-      timestamp: new Date().toISOString(),
-      change24h: -5
+    const initializeApp = async () => {
+      try {
+        // Farcaster SDK 초기화
+        if (typeof window !== 'undefined') {
+          const { sdk } = await import('@farcaster/frame-sdk');
+          await sdk.actions.ready();
+          console.log('Farcaster SDK ready called');
+        }
+      } catch (error) {
+        console.log('Not in Farcaster environment or SDK error:', error);
+      }
+
+      // Simulate Fear & Greed Index data
+      const mockData = {
+        value: 42,
+        classification: "Fear",
+        timestamp: new Date().toISOString(),
+        change24h: -5
+      };
+      setFearGreedIndex(mockData);
+      setLoading(false);
     };
-    setFearGreedIndex(mockData);
-    setLoading(false);
+
+    initializeApp();
   }, []);
 
   const getIndexColor = (value) => {
