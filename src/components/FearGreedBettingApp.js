@@ -1,20 +1,33 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { TrendingUp, TrendingDown, Clock, Coins, Trophy, AlertCircle, Activity, Users } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
-export default function FearGreedBettingApp() {
+const FearGreedBettingApp = () => {
   const { publicKey, connected } = useWallet();
-  const [loading, setLoading] = useState(true);
-  const [fearGreedIndex, setFearGreedIndex] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(55);
+  const [indexTrend, setIndexTrend] = useState('neutral');
+  const [selectedBet, setSelectedBet] = useState(null);
   const [betAmount, setBetAmount] = useState(0.01);
-  const [prediction, setPrediction] = useState(null);
-  const [countdown, setCountdown] = useState({ hours: 23, minutes: 54, seconds: 56 });
-  const [liveBets, setLiveBets] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(86400); // 24시간 카운트다운
+  const [totalUpBets, setTotalUpBets] = useState(2.99);
+  const [totalDownBets, setTotalDownBets] = useState(1.94);
+  const [userBets, setUserBets] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [recentBets, setRecentBets] = useState([
+    { user: '0xb548...', direction: 'up', amount: 0.1, time: 'just now' },
+    { user: '0x916f...', direction: 'up', amount: 0.1, time: 'just now' },
+    { user: '0x26c4...', direction: 'up', amount: 0.01, time: 'just now' },
+    { user: '0x4593...', direction: 'up', amount: 0.05, time: 'just now' },
+  ]);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Farcaster SDK 초기화
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Farcaster SDK 초기화
         if (typeof window !== 'undefined') {
           const { sdk } = await import('@farcaster/frame-sdk');
           await sdk.actions.ready();
@@ -23,211 +36,260 @@ export default function FearGreedBettingApp() {
       } catch (error) {
         console.log('Not in Farcaster environment or SDK error:', error);
       }
-
-      // Simulate Fear & Greed Index data
-      const mockData = {
-        value: 55,
-        classification: "Neutral",
-        timestamp: new Date().toISOString(),
-        change24h: 2,
-        lastUpdated: "오전 12:34:11"
-      };
-      setFearGreedIndex(mockData);
-
-      // Mock live bets
-      const mockBets = [
-        { address: "0xb548...", amount: "0.1 SOL", direction: "up", time: "just now" },
-        { address: "0x916f...", amount: "0.1 SOL", direction: "up", time: "just now" },
-        { address: "0x26c4...", amount: "0.01 SOL", direction: "up", time: "just now" },
-        { address: "0x4593...", amount: "0.05 SOL", direction: "up", time: "just now" },
-      ];
-      setLiveBets(mockBets);
-
-      setLoading(false);
     };
 
     initializeApp();
   }, []);
 
-  // Countdown timer effect
+  // Fear & Greed Index 시뮬레이션
+  const fetchFearGreedIndex = async () => {
+    try {
+      setIsLoading(true);
+      
+      // 시뮬레이션 데이터
+      const simulatedIndex = Math.max(0, Math.min(100, 55 + (Math.random() - 0.5) * 20));
+      setCurrentIndex(Math.round(simulatedIndex));
+      setLastUpdate(new Date());
+      
+      // 시뮬레이션 차트 데이터
+      const simulatedChart = [];
+      for (let i = 29; i >= 0; i--) {
+        simulatedChart.push({
+          time: 29 - i,
+          value: Math.max(0, Math.min(100, 55 + (Math.random() - 0.5) * 40))
+        });
+      }
+      setChartData(simulatedChart);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    fetchFearGreedIndex();
+  }, []);
+
+  // 카운트다운 타이머
   useEffect(() => {
     const timer = setInterval(() => {
-      setCountdown(prev => {
-        let { hours, minutes, seconds } = prev;
-        
-        if (seconds > 0) {
-          seconds--;
-        } else if (minutes > 0) {
-          minutes--;
-          seconds = 59;
-        } else if (hours > 0) {
-          hours--;
-          minutes = 59;
-          seconds = 59;
-        }
-        
-        return { hours, minutes, seconds };
-      });
+      setTimeLeft(prev => prev > 0 ? prev - 1 : 86400);
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
-  // Wave chart component matching the reference
-  const WaveChart = () => (
-    <svg viewBox="0 0 400 80" className="w-full h-16">
-      <path
-        d="M0,40 Q20,30 40,35 T80,40 T120,30 T160,45 T200,35 T240,40 T280,30 T320,45 T360,35 T400,40"
-        stroke="#22d3ee"
-        strokeWidth="2"
-        fill="none"
-        className="animate-pulse"
-      />
-    </svg>
-  );
+  // Fear & Greed Index 업데이트 (30초마다)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchFearGreedIndex();
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
-  if (loading) {
-    return (
-      <div 
-        className="min-h-screen flex items-center justify-center"
-        style={{
-          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #3730a3 100%)',
-          color: 'white'
-        }}
-      >
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-400"></div>
-      </div>
-    );
-  }
+  // 트렌드 계산
+  useEffect(() => {
+    if (chartData.length >= 2) {
+      const current = chartData[chartData.length - 1]?.value || currentIndex;
+      const previous = chartData[chartData.length - 2]?.value || currentIndex;
+      
+      if (current > previous) setIndexTrend('up');
+      else if (current < previous) setIndexTrend('down');
+      else setIndexTrend('neutral');
+    }
+  }, [chartData, currentIndex]);
+
+  // 실시간 베팅 시뮬레이션
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) { // 30% 확률로 새 베팅 추가
+        const directions = ['up', 'down'];
+        const amounts = [0.01, 0.05, 0.1];
+        const newBet = {
+          user: `0x${Math.random().toString(16).substr(2, 4)}...`,
+          direction: directions[Math.floor(Math.random() * directions.length)],
+          amount: amounts[Math.floor(Math.random() * amounts.length)],
+          time: 'just now'
+        };
+        
+        setRecentBets(prev => [newBet, ...prev.slice(0, 3)]);
+        
+        // 베팅 풀 업데이트
+        if (newBet.direction === 'up') {
+          setTotalUpBets(prev => prev + newBet.amount);
+        } else {
+          setTotalDownBets(prev => prev + newBet.amount);
+        }
+      }
+    }, 8000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getIndexColor = (index) => {
+    if (index <= 25) return 'text-red-500';
+    if (index <= 45) return 'text-orange-500';
+    if (index <= 55) return 'text-yellow-500';
+    if (index <= 75) return 'text-lime-500';
+    return 'text-green-500';
+  };
+
+  const getIndexLabel = (index) => {
+    if (index <= 25) return 'Extreme Fear';
+    if (index <= 45) return 'Fear';
+    if (index <= 55) return 'Neutral';
+    if (index <= 75) return 'Greed';
+    return 'Extreme Greed';
+  };
+
+  const calculateOdds = () => {
+    const upOdds = (totalDownBets / totalUpBets).toFixed(2);
+    const downOdds = (totalUpBets / totalDownBets).toFixed(2);
+    return { up: upOdds, down: downOdds };
+  };
+
+  const handleBet = (direction) => {
+    if (!connected) {
+      alert('Please connect your wallet first!');
+      return;
+    }
+
+    const newBet = {
+      direction,
+      amount: betAmount,
+      timestamp: Date.now(),
+      odds: direction === 'up' ? calculateOdds().up : calculateOdds().down
+    };
+
+    setUserBets(prev => [...prev, newBet]);
+    
+    if (direction === 'up') {
+      setTotalUpBets(prev => prev + betAmount);
+    } else {
+      setTotalDownBets(prev => prev + betAmount);
+    }
+
+    setSelectedBet(newBet);
+  };
+
+  const odds = calculateOdds();
 
   return (
-    <div 
-      className="min-h-screen text-white p-4"
-      style={{
-        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #3730a3 100%)',
-        color: 'white'
-      }}
-    >
-      {/* Header */}
-      <header className="text-center py-6">
-        <h1 className="text-3xl font-bold mb-2">Fear &amp; Greed Oracle</h1>
-        <p className="text-purple-200 text-lg">Predict Bitcoin&apos;s Fear &amp; Greed Index</p>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white p-4">
+      <div className="max-w-md mx-auto space-y-4">
+        {/* 헤더 */}
+        <div className="text-center py-4">
+          <h1 className="text-2xl font-bold mb-2">Fear &amp; Greed Oracle</h1>
+          <p className="text-sm opacity-80">Predict Bitcoin&apos;s Fear &amp; Greed Index</p>
+        </div>
 
-      <main className="max-w-md mx-auto space-y-4">
-        {/* Settlement Countdown */}
-        <div 
-          className="backdrop-blur-sm rounded-2xl p-6 border"
-          style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.8)',
-            borderColor: 'rgba(71, 85, 105, 0.5)'
-          }}
-        >
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
-              <span className="text-white text-lg">Settlement in</span>
-            </div>
-            <div 
-              className="text-4xl font-bold"
-              style={{ color: '#22d3ee' }}
-            >
-              {String(countdown.hours).padStart(2, '0')}:
-              {String(countdown.minutes).padStart(2, '0')}:
-              {String(countdown.seconds).padStart(2, '0')}
-            </div>
+        {/* 카운트다운 */}
+        <div className="bg-black/30 rounded-xl p-4 text-center backdrop-blur-sm">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Clock className="w-5 h-5" />
+            <span className="text-sm">Settlement in</span>
+          </div>
+          <div className="text-2xl font-mono font-bold text-cyan-400">
+            {formatTime(timeLeft)}
           </div>
         </div>
 
-        {/* Current Fear & Greed Index */}
-        <div 
-          className="backdrop-blur-sm rounded-2xl p-6 border"
-          style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.8)',
-            borderColor: 'rgba(71, 85, 105, 0.5)'
-          }}
-        >
-          <h2 className="text-center text-white text-xl mb-6">Current Fear &amp; Greed Index</h2>
-          
-          {fearGreedIndex && (
-            <div className="text-center">
-              <div 
-                className="text-8xl font-bold mb-2"
-                style={{ color: '#fbbf24' }}
-              >
-                {fearGreedIndex.value}
-              </div>
-              <div 
-                className="text-2xl font-semibold mb-4"
-                style={{ color: '#fbbf24' }}
-              >
-                {fearGreedIndex.classification}
+        {/* 현재 지수 + 차트 */}
+        <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm">
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-2"></div>
+              <div className="text-sm opacity-80">Loading Fear &amp; Greed Index...</div>
+            </div>
+          ) : (
+            <>
+              <div className="text-center mb-4">
+                <div className="text-sm opacity-80 mb-2">Current Fear &amp; Greed Index</div>
+                <div className={`text-3xl font-bold mb-1 ${getIndexColor(currentIndex)}`}>
+                  {currentIndex}
+                </div>
+                <div className={`text-sm ${getIndexColor(currentIndex)}`}>
+                  {getIndexLabel(currentIndex)}
+                </div>
+                <div className="flex justify-center items-center gap-2 mt-2">
+                  {indexTrend === 'up' && <TrendingUp className="w-5 h-5 text-green-500" />}
+                  {indexTrend === 'down' && <TrendingDown className="w-5 h-5 text-red-500" />}
+                  {lastUpdate && (
+                    <span className="text-xs opacity-60">
+                      Updated: {lastUpdate.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
               </div>
               
-              <div className="flex items-center justify-center gap-2 text-sm mb-6" style={{ color: '#f87171' }}>
-                <span>📉</span>
-                <span>Updated: {fearGreedIndex.lastUpdated}</span>
+              {/* 미니 차트 */}
+              <div className="h-20 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#06b6d4" 
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <XAxis hide />
+                    <YAxis hide domain={[0, 100]} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
-
-              {/* Wave Chart */}
-              <div className="mb-3">
-                <WaveChart />
-              </div>
-              <div className="text-sm" style={{ color: '#9ca3af' }}>30-day trend</div>
-            </div>
+              <div className="text-center text-xs opacity-60 mt-1">30-day trend</div>
+            </>
           )}
         </div>
 
-        {/* Live Bets */}
-        <div 
-          className="backdrop-blur-sm rounded-2xl p-4 border"
-          style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.8)',
-            borderColor: 'rgba(71, 85, 105, 0.5)'
-          }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span style={{ color: '#22d3ee' }}>📊</span>
-            <h3 className="text-xl font-semibold">Live Bets</h3>
+        {/* 실시간 베팅 내역 */}
+        <div className="bg-black/20 rounded-xl p-3 backdrop-blur-sm">
+          <div className="flex items-center gap-2 mb-2">
+            <Activity className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm font-semibold">Live Bets</span>
           </div>
-          
-          <div className="space-y-3">
-            {liveBets.map((bet, index) => (
-              <div key={index} className="flex items-center justify-between">
+          <div className="space-y-1">
+            {recentBets.map((bet, index) => (
+              <div key={index} className="flex justify-between items-center text-xs bg-gray-700/30 rounded px-2 py-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm" style={{ color: '#9ca3af' }}>{bet.address}</span>
-                  <span className="text-sm" style={{ color: '#34d399' }}>📈</span>
+                  <span className="text-gray-400">{bet.user}</span>
+                  {bet.direction === 'up' ? 
+                    <TrendingUp className="w-3 h-3 text-green-400" /> : 
+                    <TrendingDown className="w-3 h-3 text-red-400" />
+                  }
                 </div>
-                <div className="text-right">
-                  <div className="text-white font-semibold">{bet.amount}</div>
-                  <div className="text-xs" style={{ color: '#9ca3af' }}>{bet.time}</div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{bet.amount} SOL</span>
+                  <span className="text-gray-400">{bet.time}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bet Amount Selection */}
-        <div 
-          className="backdrop-blur-sm rounded-2xl p-4 border"
-          style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.8)',
-            borderColor: 'rgba(71, 85, 105, 0.5)'
-          }}
-        >
-          <h3 className="text-center text-white text-xl mb-4">Bet Amount (SOL)</h3>
-          <div className="grid grid-cols-3 gap-3">
-            {[0.01, 0.05, 0.1].map((amount) => (
+        {/* 베팅 금액 선택 */}
+        <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm">
+          <div className="text-sm mb-3 text-center">Bet Amount (SOL)</div>
+          <div className="flex gap-2">
+            {[0.01, 0.05, 0.1].map(amount => (
               <button
                 key={amount}
                 onClick={() => setBetAmount(amount)}
-                className="py-4 px-4 rounded-xl font-bold text-lg transition-all"
-                style={{
-                  backgroundColor: betAmount === amount ? '#06b6d4' : '#374151',
-                  color: betAmount === amount ? '#000' : '#fff'
-                }}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+                  betAmount === amount
+                    ? 'bg-cyan-500 text-black'
+                    : 'bg-gray-700 hover:bg-gray-600'
+                }`}
               >
                 {amount} SOL
               </button>
@@ -235,69 +297,96 @@ export default function FearGreedBettingApp() {
           </div>
         </div>
 
-        {/* UP/DOWN Pools */}
+        {/* 베팅 풀 정보 */}
         <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => setPrediction('up')}
-            className="rounded-2xl p-6 border-2 transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
-              borderColor: prediction === 'up' ? '#2dd4bf' : 'rgba(13, 148, 136, 0.5)'
-            }}
-          >
-            <div className="text-sm mb-2 flex items-center gap-1" style={{ color: '#a7f3d0' }}>
-              <span>📈</span>
-              <span>UP Pool</span>
+          <div className="bg-green-500/20 border border-green-500/50 rounded-xl p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-4 h-4 text-green-400" />
+              <span className="text-sm">UP Pool</span>
             </div>
-            <div className="text-3xl font-bold text-white mb-2">2.99 SOL</div>
-            <div className="text-sm" style={{ color: '#a7f3d0' }}>Odds: 0.65x</div>
-          </button>
-
-          <button
-            onClick={() => setPrediction('down')}
-            className="rounded-2xl p-6 border-2 transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-              borderColor: prediction === 'down' ? '#a855f7' : 'rgba(124, 58, 237, 0.5)'
-            }}
-          >
-            <div className="text-sm mb-2 flex items-center gap-1" style={{ color: '#ddd6fe' }}>
-              <span>📉</span>
-              <span>DOWN Pool</span>
+            <div className="text-lg font-bold">{totalUpBets.toFixed(2)} SOL</div>
+            <div className="text-xs opacity-80">Odds: {odds.up}x</div>
+          </div>
+          <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingDown className="w-4 h-4 text-red-400" />
+              <span className="text-sm">DOWN Pool</span>
             </div>
-            <div className="text-3xl font-bold text-white mb-2">1.94 SOL</div>
-            <div className="text-sm" style={{ color: '#ddd6fe' }}>Odds: 1.54x</div>
-          </button>
+            <div className="text-lg font-bold">{totalDownBets.toFixed(2)} SOL</div>
+            <div className="text-xs opacity-80">Odds: {odds.down}x</div>
+          </div>
         </div>
 
-        {/* Connect Wallet / Place Bet Button */}
-        {connected ? (
-          prediction && (
-            <button
-              className="w-full py-4 rounded-2xl font-bold text-xl transition-all border"
-              style={{
-                background: 'linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%)',
-                borderColor: 'rgba(124, 58, 237, 0.5)',
-                color: 'white'
-              }}
-            >
-              Place Bet ({betAmount} SOL)
-            </button>
-          )
+        {/* 지갑 연결 / 베팅 버튼 */}
+        {!connected ? (
+          <div className="text-center">
+            <WalletMultiButton className="!w-full !bg-gradient-to-r !from-purple-600 !to-blue-600 hover:!from-purple-700 hover:!to-blue-700 !py-4 !rounded-xl !font-semibold !transition-all !transform hover:!scale-[1.02]" />
+          </div>
         ) : (
-          <button 
-            className="w-full py-4 rounded-2xl font-bold text-xl transition-all border flex items-center justify-center gap-3"
-            style={{
-              background: 'linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%)',
-              borderColor: 'rgba(124, 58, 237, 0.5)',
-              color: 'white'
-            }}
-          >
-            <span>🔗</span>
-            <span>Connect Solana Wallet</span>
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => handleBet('up')}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 py-4 rounded-xl font-semibold transition-all transform hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                BET UP
+              </div>
+              <div className="text-xs opacity-80">{odds.up}x payout</div>
+            </button>
+            <button
+              onClick={() => handleBet('down')}
+              className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 py-4 rounded-xl font-semibold transition-all transform hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <TrendingDown className="w-5 h-5" />
+                BET DOWN
+              </div>
+              <div className="text-xs opacity-80">{odds.down}x payout</div>
+            </button>
+          </div>
         )}
-      </main>
+
+        {/* 내 베팅 기록 */}
+        {userBets.length > 0 && (
+          <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <Trophy className="w-4 h-4" />
+              <span className="text-sm font-semibold">My Positions</span>
+            </div>
+            <div className="space-y-2">
+              {userBets.slice(-3).map((bet, index) => (
+                <div key={index} className="flex justify-between items-center bg-gray-700/50 rounded-lg p-2">
+                  <div className="flex items-center gap-2">
+                    {bet.direction === 'up' ? 
+                      <TrendingUp className="w-4 h-4 text-green-400" /> : 
+                      <TrendingDown className="w-4 h-4 text-red-400" />
+                    }
+                    <span className="text-sm font-semibold">{bet.direction.toUpperCase()}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold">{bet.amount} SOL</div>
+                    <div className="text-xs opacity-80">{bet.odds}x odds</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 경고 메시지 */}
+        <div className="bg-amber-500/20 border border-amber-500/50 rounded-xl p-3">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-amber-200">
+              <div className="font-semibold mb-1">Risk Warning</div>
+              <div>This is a betting game. Only bet what you can afford to lose.</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-} 
+};
+
+export default FearGreedBettingApp; 
