@@ -18,7 +18,7 @@ export default function FearGreedBettingApp() {
     <div className="min-h-screen bg-gray-900 text-white p-4">
       <header className="max-w-4xl mx-auto mb-8">
         <h1 className="text-4xl font-bold mb-2">Fear & Greed Oracle</h1>
-        <p className="text-gray-400">Predict Bitcoin's Fear & Greed Index and earn SOL rewards</p>
+        <p className="text-gray-400">Predict Bitcoin&apos;s Fear & Greed Index and earn SOL rewards</p>
       </header>
 
       <main className="max-w-4xl mx-auto">
