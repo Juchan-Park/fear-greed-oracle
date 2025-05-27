@@ -2,49 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 17, 24, 39;
-  --background-end-rgb: 31, 41, 55;
-}
-
+/* Remove conflicting body styles to allow Tailwind classes to work */
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom wallet button styling */
+/* Custom wallet button styling - simplified */
 .wallet-adapter-button {
-  @apply !bg-gradient-to-r !from-blue-600 !to-purple-600 hover:!from-blue-700 hover:!to-purple-700 !border-none !rounded-lg !font-semibold !transition-all !px-6 !py-3;
+  background: linear-gradient(to right, #2563eb, #9333ea);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  padding: 0.75rem 1.5rem;
+  color: white;
 }
 
 .wallet-adapter-button:not([disabled]):hover {
-  @apply !bg-gradient-to-r !from-blue-700 !to-purple-700;
+  background: linear-gradient(to right, #1d4ed8, #7c3aed);
 }
 
 .wallet-adapter-button[disabled] {
-  @apply !opacity-50 !cursor-not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .wallet-adapter-modal {
-  @apply !bg-gray-800;
+  background-color: #1f2937;
 }
 
 .wallet-adapter-modal-title {
-  @apply !text-white;
+  color: white;
 }
 
 .wallet-adapter-modal-list {
-  @apply !bg-gray-800;
+  background-color: #1f2937;
 }
 
 .wallet-adapter-modal-list-more {
-  @apply !bg-gray-700 !text-white;
+  background-color: #374151;
+  color: white;
 }
 
 /* Custom scrollbar */
@@ -53,15 +51,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-800;
+  background-color: #1f2937;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-600 rounded-full;
+  background-color: #4b5563;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
+  background-color: #6b7280;
 }
 
 /* Animations */
