@@ -196,12 +196,12 @@ const FearGreedBettingApp = () => {
   const SemicircleGauge = ({ value, size = 200 }) => {
     const radius = size / 2 - 20;
     const centerX = size / 2;
-    const centerY = size / 2;
+    const centerY = size / 2 + 20; // 중심을 아래로 이동
     
-    // 반원 경로 생성
+    // 반원 경로 생성 (90도 회전 - 그릇이 엎어진 모양)
     const createArc = (startAngle, endAngle, color) => {
-      const start = polarToCartesian(centerX, centerY, radius, endAngle);
-      const end = polarToCartesian(centerX, centerY, radius, startAngle);
+      const start = polarToCartesian(centerX, centerY, radius, endAngle + 90);
+      const end = polarToCartesian(centerX, centerY, radius, startAngle + 90);
       const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
       return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
     };
@@ -214,12 +214,12 @@ const FearGreedBettingApp = () => {
       };
     };
     
-    // 바늘 위치 계산 (0-100을 180도로 매핑)
-    const needleAngle = (value / 100) * 180;
+    // 바늘 위치 계산 (0-100을 180도로 매핑, 90도 회전)
+    const needleAngle = (value / 100) * 180 + 90;
     const needleEnd = polarToCartesian(centerX, centerY, radius - 10, needleAngle);
     
     return (
-      <svg width={size} height={size / 2 + 40} style={{ overflow: 'visible' }}>
+      <svg width={size} height={size / 2 + 60} style={{ overflow: 'visible' }}>
         {/* 배경 반원 */}
         <path
           d={createArc(0, 180)}
@@ -253,7 +253,7 @@ const FearGreedBettingApp = () => {
         {/* 숫자 표시 */}
         <text
           x={centerX}
-          y={centerY + 30}
+          y={centerY - 30}
           textAnchor="middle"
           fill="white"
           fontSize="24"
@@ -382,14 +382,16 @@ const FearGreedBettingApp = () => {
                         stroke="#fbbf24" 
                         strokeDasharray="3 3" 
                         strokeWidth={1}
-                        label={{ value: `Yesterday: ${yesterdayAverage}`, position: 'topRight', fontSize: 10, fill: '#fbbf24' }}
                       />
                       <XAxis hide />
                       <YAxis hide domain={[0, 100]} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div style={{ textAlign: 'center', fontSize: '12px', opacity: 0.6, marginTop: '4px' }}>30-day trend</div>
+                <div style={{ textAlign: 'center', fontSize: '10px', color: '#fbbf24', marginTop: '4px' }}>
+                  Yesterday: {yesterdayAverage}
+                </div>
+                <div style={{ textAlign: 'center', fontSize: '12px', opacity: 0.6, marginTop: '2px' }}>30-day trend</div>
               </>
             )}
           </div>
@@ -537,7 +539,8 @@ const FearGreedBettingApp = () => {
                   backgroundColor: 'rgba(0,0,0,0.3)',
                   color: 'white',
                   fontSize: '12px',
-                  outline: 'none'
+                  outline: 'none',
+                  boxSizing: 'border-box'
                 }}
               />
             </div>
