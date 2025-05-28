@@ -25,6 +25,7 @@ const FearGreedBettingApp = () => {
   ]);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Farcaster SDK 초기화
   useEffect(() => {
@@ -41,6 +42,14 @@ const FearGreedBettingApp = () => {
     };
 
     initializeApp();
+  }, []);
+
+  // 현재 시간 업데이트
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   // Fear & Greed Index 시뮬레이션
@@ -196,12 +205,12 @@ const FearGreedBettingApp = () => {
   const SemicircleGauge = ({ value, size = 200 }) => {
     const radius = size / 2 - 20;
     const centerX = size / 2;
-    const centerY = size / 2 + 20; // 중심을 아래로 이동
+    const centerY = size / 2 - 20; // 중심을 위로 이동 (위쪽 반원)
     
-    // 반원 경로 생성 (90도 회전 - 그릇이 엎어진 모양)
+    // 반원 경로 생성 (위쪽 반원 - 180도 뒤집음)
     const createArc = (startAngle, endAngle, color) => {
-      const start = polarToCartesian(centerX, centerY, radius, endAngle + 90);
-      const end = polarToCartesian(centerX, centerY, radius, startAngle + 90);
+      const start = polarToCartesian(centerX, centerY, radius, endAngle - 90);
+      const end = polarToCartesian(centerX, centerY, radius, startAngle - 90);
       const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
       return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
     };
@@ -214,8 +223,8 @@ const FearGreedBettingApp = () => {
       };
     };
     
-    // 바늘 위치 계산 (0-100을 180도로 매핑, 90도 회전)
-    const needleAngle = (value / 100) * 180 + 90;
+    // 바늘 위치 계산 (0-100을 180도로 매핑, 위쪽 반원)
+    const needleAngle = (value / 100) * 180 - 90;
     const needleEnd = polarToCartesian(centerX, centerY, radius - 10, needleAngle);
     
     return (
@@ -253,7 +262,7 @@ const FearGreedBettingApp = () => {
         {/* 숫자 표시 */}
         <text
           x={centerX}
-          y={centerY - 30}
+          y={centerY + 30}
           textAnchor="middle"
           fill="white"
           fontSize="24"
@@ -300,22 +309,29 @@ const FearGreedBettingApp = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '16px' }}>
-          {/* 카운트다운 */}
+          {/* 시간 표시 */}
           <div 
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.3)',
               borderRadius: '12px',
               padding: '16px',
-              textAlign: 'center',
-              backdropFilter: 'blur(4px)'
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-              <Clock style={{ width: '20px', height: '20px' }} />
-              <span style={{ fontSize: '14px' }}>Settlement in</span>
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Ends in</div>
+              <div style={{ fontSize: '20px', fontFamily: 'monospace', fontWeight: 'bold', color: '#22d3ee' }}>
+                {formatTime(timeLeft)}
+              </div>
             </div>
-            <div style={{ fontSize: '24px', fontFamily: 'monospace', fontWeight: 'bold', color: '#22d3ee' }}>
-              {formatTime(timeLeft)}
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Current Time</div>
+              <div style={{ fontSize: '16px', fontFamily: 'monospace', fontWeight: 'bold', color: '#a855f7' }}>
+                {currentTime.toLocaleTimeString()}
+              </div>
             </div>
           </div>
 
@@ -396,7 +412,7 @@ const FearGreedBettingApp = () => {
             )}
           </div>
 
-          {/* 베팅 풀 정보 (위로 이동) */}
+          {/* 베팅 풀 정보 */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div style={{ 
               backgroundColor: 'rgba(34, 197, 94, 0.2)', 
@@ -423,69 +439,6 @@ const FearGreedBettingApp = () => {
               </div>
               <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{totalDownBets.toFixed(2)} SOL</div>
               <div style={{ fontSize: '12px', opacity: 0.8 }}>Odds: {odds.down}x</div>
-            </div>
-          </div>
-
-          {/* 실시간 베팅 내역 (아래로 이동) */}
-          <div 
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '12px',
-              padding: '12px',
-              backdropFilter: 'blur(4px)'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <Activity style={{ width: '16px', height: '16px', color: '#22d3ee' }} />
-              <span style={{ fontSize: '14px', fontWeight: '600' }}>Live Bets</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {recentBets.map((bet, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  fontSize: '12px', 
-                  backgroundColor: 'rgba(55, 65, 81, 0.3)', 
-                  borderRadius: '4px', 
-                  padding: '6px 8px' 
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                    <span style={{ color: '#9ca3af', minWidth: '60px' }}>{bet.user}</span>
-                    {bet.direction === 'up' ? 
-                      <TrendingUp style={{ width: '12px', height: '12px', color: '#4ade80' }} /> : 
-                      <TrendingDown style={{ width: '12px', height: '12px', color: '#f87171' }} />
-                    }
-                    {bet.comment && (
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '4px',
-                        backgroundColor: 'rgba(0,0,0,0.3)',
-                        padding: '2px 6px',
-                        borderRadius: '8px',
-                        flex: 1,
-                        maxWidth: '120px'
-                      }}>
-                        <MessageCircle style={{ width: '10px', height: '10px', color: '#22d3ee' }} />
-                        <span style={{ 
-                          color: '#e5e7eb', 
-                          fontSize: '10px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}>
-                          {bet.comment}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: '600' }}>{bet.amount} SOL</span>
-                    <span style={{ color: '#9ca3af' }}>{bet.time}</span>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -547,7 +500,7 @@ const FearGreedBettingApp = () => {
           </div>
 
           {/* 베팅 버튼 */}
-          {connected ? (
+          {connected && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <button
                 onClick={() => handleBet('up')}
@@ -593,10 +546,6 @@ const FearGreedBettingApp = () => {
                 </div>
                 <div style={{ fontSize: '12px', opacity: 0.8 }}>{odds.down}x payout</div>
               </button>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', fontSize: '14px', opacity: 0.8, padding: '16px' }}>
-              Connect your wallet to start betting
             </div>
           )}
 
@@ -645,6 +594,69 @@ const FearGreedBettingApp = () => {
               </div>
             </div>
           )}
+
+          {/* 실시간 베팅 내역 (맨 아래로 이동) */}
+          <div 
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '12px',
+              padding: '12px',
+              backdropFilter: 'blur(4px)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <Activity style={{ width: '16px', height: '16px', color: '#22d3ee' }} />
+              <span style={{ fontSize: '14px', fontWeight: '600' }}>Live Bets</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {recentBets.map((bet, index) => (
+                <div key={index} style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  fontSize: '12px', 
+                  backgroundColor: 'rgba(55, 65, 81, 0.3)', 
+                  borderRadius: '4px', 
+                  padding: '6px 8px' 
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                    <span style={{ color: '#9ca3af', minWidth: '60px' }}>{bet.user}</span>
+                    {bet.direction === 'up' ? 
+                      <TrendingUp style={{ width: '12px', height: '12px', color: '#4ade80' }} /> : 
+                      <TrendingDown style={{ width: '12px', height: '12px', color: '#f87171' }} />
+                    }
+                    {bet.comment && (
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: 'rgba(0,0,0,0.3)',
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        flex: 1,
+                        maxWidth: '120px'
+                      }}>
+                        <MessageCircle style={{ width: '10px', height: '10px', color: '#22d3ee' }} />
+                        <span style={{ 
+                          color: '#e5e7eb', 
+                          fontSize: '10px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {bet.comment}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontWeight: '600' }}>{bet.amount} SOL</span>
+                    <span style={{ color: '#9ca3af' }}>{bet.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
