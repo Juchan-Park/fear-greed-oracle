@@ -1,26 +1,12 @@
-import { useEffect, useMemo } from 'react';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
-
-// Import wallet adapter CSS first
-import '@solana/wallet-adapter-react-ui/styles.css';
+import { useEffect } from 'react';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { config } from '../lib/wagmi';
 import '../styles/globals.css';
 
-// Solana wallet adapters
-import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+const queryClient = new QueryClient();
 
 export default function MyApp({ Component, pageProps }) {
-  const endpoint = useMemo(() => 
-    process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl('mainnet-beta'), 
-    []
-  );
-
-  const wallets = useMemo(() => [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ], []);
-
   useEffect(() => {
     // 미니앱 환경 감지
     if (typeof window !== 'undefined') {
@@ -39,12 +25,10 @@ export default function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
-        <WalletModalProvider>
-          <Component {...pageProps} />
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 } 

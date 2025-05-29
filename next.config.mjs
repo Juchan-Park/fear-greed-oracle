@@ -9,7 +9,13 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true
-  }
+  },
+  transpilePackages: [
+    '@farcaster/frame-sdk',
+    '@farcaster/frame-wagmi-connector',
+    'wagmi',
+    'viem'
+  ]
 }
 
 export default nextConfig;
