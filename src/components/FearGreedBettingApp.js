@@ -46,50 +46,39 @@ const FearGreedBettingApp = () => {
         const isInIframe = window.self !== window.top;
         setIsFarcasterEnvironment(isInIframe);
         
+        console.log('Environment check:', { isInIframe, userAgent: navigator.userAgent });
+        
         if (isInIframe) {
           console.log('Running in iframe (likely Farcaster)');
           
-          // Farcaster SDK 로드 대기
-          let attempts = 0;
-          const maxAttempts = 50; // 5초 대기
-          
-          const waitForSDK = () => {
-            attempts++;
-            console.log(`Waiting for Farcaster SDK... attempt ${attempts}`);
+          // Farcaster SDK 로드 시도
+          try {
+            const { sdk } = await import('@farcaster/frame-sdk');
+            console.log('Farcaster SDK imported successfully');
             
-            if (window.farcasterSolana || window.parent?.farcasterSolana) {
-              console.log('Farcaster Solana SDK found!');
-              const sdk = window.farcasterSolana || window.parent.farcasterSolana;
-              
-              // 사용자 정보 가져오기
-              if (sdk.context?.user) {
-                console.log('Farcaster user found:', sdk.context.user);
-                setFarcasterUser(sdk.context.user);
-                setFarcasterContext(sdk.context);
-              } else {
-                console.log('No user in Farcaster context, setting demo user');
-                setFarcasterUser({ fid: 'demo', username: 'demo_user' });
-              }
-              
-              setIsInitializing(false);
-              return;
-            }
+            // SDK 초기화
+            await sdk.actions.ready();
+            console.log('Farcaster SDK ready called');
             
-            if (attempts < maxAttempts) {
-              setTimeout(waitForSDK, 100);
+            // 사용자 정보 가져오기
+            if (sdk.context?.user) {
+              console.log('Farcaster user found:', sdk.context.user);
+              setFarcasterUser(sdk.context.user);
+              setFarcasterContext(sdk.context);
             } else {
-              console.log('Farcaster SDK not found, proceeding with demo mode');
+              console.log('No user in Farcaster context, setting demo user');
               setFarcasterUser({ fid: 'demo', username: 'demo_user' });
-              setIsInitializing(false);
             }
-          };
-          
-          waitForSDK();
+          } catch (sdkError) {
+            console.error('Error loading Farcaster SDK:', sdkError);
+            setFarcasterUser({ fid: 'demo', username: 'demo_user' });
+          }
         } else {
           console.log('Running standalone (not in iframe)');
           setFarcasterUser({ fid: 'demo', username: 'demo_user' });
-          setIsInitializing(false);
         }
+        
+        setIsInitializing(false);
       } catch (error) {
         console.error('Error initializing Farcaster:', error);
         setFarcasterUser({ fid: 'demo', username: 'demo_user' });
@@ -97,7 +86,10 @@ const FearGreedBettingApp = () => {
       }
     };
 
-    initializeFarcaster();
+    // 짧은 지연 후 초기화 (DOM이 완전히 로드되도록)
+    const timer = setTimeout(initializeFarcaster, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Farcaster 환경에서 자동 연결 확인
@@ -384,6 +376,12 @@ const FearGreedBettingApp = () => {
           <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Loading Mini App...</div>
           <div style={{ fontSize: '14px', color: '#22d3ee' }}>Initializing Farcaster SDK...</div>
         </div>
+        <style jsx>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
