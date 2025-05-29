@@ -414,7 +414,7 @@ const FearGreedBettingApp = () => {
           alignItems: 'flex-start',
           marginBottom: '24px' 
         }}>
-          <div style={{ textAlign: 'left' }}>
+          <div style={{ textAlign: 'left', flex: 1 }}>
             <h1 style={{
               fontSize: '32px',
               fontWeight: 'bold',
@@ -438,7 +438,7 @@ const FearGreedBettingApp = () => {
                 <Clock size={16} />
                 <span>Ends in {formatTime(timeLeft)}</span>
               </div>
-              <div style={{ fontSize: '14px', color: '#d1d5db' }}>
+              <div style={{ fontSize: '14px', color: '#d1d5db', textAlign: 'right' }}>
                 {formatCurrentTime(currentTime)}
               </div>
             </div>
@@ -457,7 +457,8 @@ const FearGreedBettingApp = () => {
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '12px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                marginLeft: '16px'
               }}
             >
               Connect
@@ -470,29 +471,29 @@ const FearGreedBettingApp = () => {
           background: 'rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(8px)',
           borderRadius: '16px',
-          padding: '24px',
+          padding: '20px',
           marginBottom: '24px',
           border: '1px solid rgba(255, 255, 255, 0.2)'
         }}>
-          <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <div style={{ textAlign: 'center' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              marginBottom: '16px'
+              marginBottom: '12px'
             }}>
               <Activity size={20} color="#22d3ee" />
               <span style={{ fontSize: '18px', fontWeight: '600' }}>Current Index</span>
             </div>
             
             {/* 반원 게이지 */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
               <SemicircleGauge value={currentIndex} size={280} />
             </div>
             
             {/* 인덱스 숫자와 라벨 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
               <div style={{
                 fontSize: '48px',
                 fontWeight: 'bold',
@@ -511,7 +512,7 @@ const FearGreedBettingApp = () => {
 
             {/* 차트 (Current Index 섹션 내부) */}
             {chartData.length > 0 && (
-              <div style={{ marginBottom: '16px' }}>
+              <div>
                 <div style={{ height: '120px', display: 'flex', justifyContent: 'center' }}>
                   <ResponsiveContainer width="90%" height="100%">
                     <LineChart data={chartData}>
@@ -537,7 +538,7 @@ const FearGreedBettingApp = () => {
                   gap: '8px',
                   fontSize: '14px',
                   color: '#d1d5db',
-                  marginTop: '12px'
+                  marginTop: '8px'
                 }}>
                   {indexTrend === 'up' && <TrendingUp size={16} color="#22c55e" />}
                   {indexTrend === 'down' && <TrendingDown size={16} color="#ef4444" />}
