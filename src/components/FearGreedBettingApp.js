@@ -15,19 +15,19 @@ const FearGreedBettingApp = () => {
   const [currentIndex, setCurrentIndex] = useState(55);
   const [indexTrend, setIndexTrend] = useState('neutral');
   const [selectedBet, setSelectedBet] = useState(null);
-  const [betAmount, setBetAmount] = useState(0.01);
+  const [betAmount, setBetAmount] = useState(1);
   const [betComment, setBetComment] = useState('');
   const [timeLeft, setTimeLeft] = useState(86400); // 24시간 카운트다운
-  const [totalUpBets, setTotalUpBets] = useState(2.99);
-  const [totalDownBets, setTotalDownBets] = useState(1.94);
+  const [totalUpBets, setTotalUpBets] = useState(299);
+  const [totalDownBets, setTotalDownBets] = useState(194);
   const [userBets, setUserBets] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [yesterdayAverage, setYesterdayAverage] = useState(50); // 어제 평균값
   const [recentBets, setRecentBets] = useState([
-    { user: '0xb548...', direction: 'up', amount: 0.1, time: 'just now', comment: 'Bitcoin to the moon! 🚀' },
-    { user: '0x916f...', direction: 'up', amount: 0.1, time: 'just now', comment: 'Bullish on crypto' },
-    { user: '0x26c4...', direction: 'up', amount: 0.01, time: 'just now', comment: '' },
-    { user: '0x4593...', direction: 'down', amount: 0.05, time: 'just now', comment: 'Market correction incoming' },
+    { user: '0xb548...', direction: 'up', amount: 10, time: 'just now', comment: 'Bitcoin to the moon! 🚀' },
+    { user: '0x916f...', direction: 'up', amount: 5, time: 'just now', comment: 'Bullish on crypto' },
+    { user: '0x26c4...', direction: 'up', amount: 1, time: 'just now', comment: '' },
+    { user: '0x4593...', direction: 'down', amount: 5, time: 'just now', comment: 'Market correction incoming' },
   ]);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -183,7 +183,7 @@ const FearGreedBettingApp = () => {
     const interval = setInterval(() => {
       if (Math.random() > 0.7) { // 30% 확률로 새 베팅 추가
         const directions = ['up', 'down'];
-        const amounts = [0.01, 0.05, 0.1];
+        const amounts = [1, 5, 10];
         const comments = ['', 'HODL strong!', 'Market looks bullish', 'Time to buy the dip', 'Feeling lucky today', 'Let\'s go!'];
         const newBet = {
           user: `0x${Math.random().toString(16).substr(2, 4)}...`,
@@ -399,65 +399,59 @@ const FearGreedBettingApp = () => {
         padding: '24px 16px',
         boxSizing: 'border-box'
       }}>
-        {/* 헤더 */}
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: 'bold',
-            background: 'linear-gradient(90deg, #22d3ee 0%, #a855f7 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            margin: '0 0 8px 0'
-          }}>
-            Fear & Greed Oracle
-          </h1>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            fontSize: '14px',
-            color: '#d1d5db'
-          }}>
-            <Clock size={16} />
-            <span>Next update in {formatTime(timeLeft)}</span>
-          </div>
-        </div>
-
-        {/* 지갑 연결 상태 */}
-        {!isConnected && farcasterUser?.fid !== 'demo' && (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: '16px',
-            padding: '16px',
-            marginBottom: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            textAlign: 'center'
-          }}>
-            <div style={{ marginBottom: '12px', fontSize: '16px', fontWeight: '600' }}>
-              Connect Your Ethereum Wallet
+        {/* 헤더 with 지갑 버튼 */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start',
+          marginBottom: '24px' 
+        }}>
+          <div style={{ textAlign: 'left' }}>
+            <h1 style={{
+              fontSize: '32px',
+              fontWeight: 'bold',
+              background: 'linear-gradient(90deg, #22d3ee 0%, #a855f7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              margin: '0 0 8px 0'
+            }}>
+              Fear & Greed Oracle
+            </h1>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              color: '#d1d5db'
+            }}>
+              <Clock size={16} />
+              <span>Next update in {formatTime(timeLeft)}</span>
             </div>
+          </div>
+
+          {/* 지갑 연결 버튼 (우측 상단) */}
+          {!isConnected && farcasterUser?.fid !== 'demo' && (
             <button
               onClick={() => connect({ connector: connectors[0] })}
               style={{
                 background: 'linear-gradient(90deg, #06b6d4 0%, #2563eb 100%)',
                 color: 'white',
-                fontWeight: 'bold',
-                padding: '12px 24px',
+                fontWeight: '600',
+                padding: '8px 12px',
                 borderRadius: '8px',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '16px'
+                fontSize: '12px',
+                whiteSpace: 'nowrap'
               }}
             >
-              Connect Wallet
+              Connect
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Fear & Greed Index 게이지 */}
+        {/* Fear & Greed Index 게이지 with 차트 */}
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(8px)',
@@ -483,7 +477,7 @@ const FearGreedBettingApp = () => {
               <SemicircleGauge value={currentIndex} size={200} />
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
               <div style={{
                 fontSize: '48px',
                 fontWeight: 'bold',
@@ -511,6 +505,50 @@ const FearGreedBettingApp = () => {
                 <span>vs yesterday avg: {yesterdayAverage}</span>
               </div>
             </div>
+
+            {/* 30-Day Trend 차트 (Current Index 섹션 내부) */}
+            {chartData.length > 0 && (
+              <div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginBottom: '16px'
+                }}>
+                  <Activity size={16} color="#22d3ee" />
+                  <span style={{ fontSize: '16px', fontWeight: '600' }}>30-Day Trend</span>
+                </div>
+                
+                <div style={{ height: '120px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <XAxis 
+                        dataKey="time" 
+                        axisLine={false} 
+                        tickLine={false}
+                        tick={{ fill: '#9ca3af', fontSize: 10 }}
+                      />
+                      <YAxis 
+                        domain={[0, 100]}
+                        axisLine={false} 
+                        tickLine={false}
+                        tick={{ fill: '#9ca3af', fontSize: 10 }}
+                      />
+                      <ReferenceLine y={25} stroke="#ef4444" strokeDasharray="3 3" />
+                      <ReferenceLine y={75} stroke="#22c55e" strokeDasharray="3 3" />
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#06b6d4" 
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -547,7 +585,7 @@ const FearGreedBettingApp = () => {
               border: '1px solid rgba(34, 197, 94, 0.3)'
             }}>
               <div style={{ color: '#22c55e', fontSize: '14px', fontWeight: '500' }}>UP Pool</div>
-              <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{totalUpBets.toFixed(2)} ETH</div>
+              <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{totalUpBets.toLocaleString()} USDC</div>
               <div style={{ fontSize: '12px', color: '#d1d5db' }}>Odds: {odds.up}x</div>
             </div>
             <div style={{
@@ -557,7 +595,7 @@ const FearGreedBettingApp = () => {
               border: '1px solid rgba(239, 68, 68, 0.3)'
             }}>
               <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '500' }}>DOWN Pool</div>
-              <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{totalDownBets.toFixed(2)} ETH</div>
+              <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{totalDownBets.toLocaleString()} USDC</div>
               <div style={{ fontSize: '12px', color: '#d1d5db' }}>Odds: {odds.down}x</div>
             </div>
           </div>
@@ -565,18 +603,19 @@ const FearGreedBettingApp = () => {
           {/* 베팅 금액 설정 */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
-              Bet Amount (ETH)
+              Bet Amount (USDC)
             </label>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-              {[0.01, 0.05, 0.1, 0.5].map(amount => (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {[1, 5, 10].map(amount => (
                 <button
                   key={amount}
                   onClick={() => setBetAmount(amount)}
                   style={{
-                    padding: '4px 12px',
+                    flex: 1,
+                    padding: '12px',
                     borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
+                    fontSize: '16px',
+                    fontWeight: '600',
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
@@ -594,28 +633,10 @@ const FearGreedBettingApp = () => {
                     }
                   }}
                 >
-                  {amount}
+                  {amount} USDC
                 </button>
               ))}
             </div>
-            <input
-              type="number"
-              value={betAmount}
-              onChange={(e) => setBetAmount(parseFloat(e.target.value) || 0)}
-              step="0.01"
-              min="0.01"
-              style={{
-                width: '100%',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                color: 'white',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
-              placeholder="Custom amount"
-            />
           </div>
 
           {/* 코멘트 입력 */}
@@ -752,7 +773,7 @@ const FearGreedBettingApp = () => {
                       {bet.direction.toUpperCase()}
                     </span>
                   </div>
-                  <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{bet.amount} ETH</div>
+                  <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{bet.amount} USDC</div>
                 </div>
                 {bet.comment && (
                   <div style={{
@@ -816,7 +837,7 @@ const FearGreedBettingApp = () => {
                       }}>
                         {bet.direction.toUpperCase()}
                       </span>
-                      <span style={{ fontSize: '14px' }}>{bet.amount} ETH</span>
+                      <span style={{ fontSize: '14px' }}>{bet.amount} USDC</span>
                       <span style={{ fontSize: '12px', color: '#9ca3af' }}>@{bet.odds}x</span>
                     </div>
                     <div style={{ fontSize: '12px', color: '#9ca3af' }}>
@@ -828,56 +849,6 @@ const FearGreedBettingApp = () => {
                   )}
                 </div>
               ))}
-            </div>
-          </div>
-        )}
-
-        {/* 차트 섹션 */}
-        {chartData.length > 0 && (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: '16px',
-            padding: '24px',
-            marginBottom: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginBottom: '16px'
-            }}>
-              <Activity size={20} color="#22d3ee" />
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>30-Day Trend</span>
-            </div>
-            
-            <div style={{ height: '192px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <XAxis 
-                    dataKey="time" 
-                    axisLine={false} 
-                    tickLine={false}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                  />
-                  <YAxis 
-                    domain={[0, 100]}
-                    axisLine={false} 
-                    tickLine={false}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                  />
-                  <ReferenceLine y={25} stroke="#ef4444" strokeDasharray="3 3" />
-                  <ReferenceLine y={75} stroke="#22c55e" strokeDasharray="3 3" />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#06b6d4" 
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
             </div>
           </div>
         )}
@@ -920,7 +891,7 @@ const FearGreedBettingApp = () => {
                 </div>
                 <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Bet Placed!</h3>
                 <p style={{ color: '#d1d5db', marginBottom: '16px' }}>
-                  You bet {selectedBet.amount} ETH on {selectedBet.direction.toUpperCase()}
+                  You bet {selectedBet.amount} USDC on {selectedBet.direction.toUpperCase()}
                 </p>
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.1)',
@@ -930,7 +901,7 @@ const FearGreedBettingApp = () => {
                 }}>
                   <div style={{ fontSize: '14px', color: '#d1d5db' }}>Potential Payout</div>
                   <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#22c55e' }}>
-                    {(selectedBet.amount * parseFloat(selectedBet.odds)).toFixed(3)} ETH
+                    {(selectedBet.amount * parseFloat(selectedBet.odds)).toFixed(0)} USDC
                   </div>
                 </div>
                 <button
