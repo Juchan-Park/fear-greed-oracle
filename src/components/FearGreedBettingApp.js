@@ -105,11 +105,23 @@ const FearGreedBettingApp = () => {
     }
   }, [isFarcasterEnvironment, farcasterUser, isConnected, address]);
 
-  // 현재 시간 업데이트
+  // 현재 시간 및 타임존 업데이트
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now);
+      
+      // 타임존 정보 가져오기
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timeZoneAbbr = new Intl.DateTimeFormat('en', {
+        timeZoneName: 'short'
+      }).formatToParts(now).find(part => part.type === 'timeZoneName')?.value || 'UTC';
+      
+      setTimezone(timeZoneAbbr);
+    };
+    
+    updateTime(); // 초기 실행
+    const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -214,6 +226,14 @@ const FearGreedBettingApp = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatCurrentTime = (date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${ampm} ${displayHours.toString().padStart(2, '0')} : ${minutes.toString().padStart(2, '0')} (${timezone})`;
+  };
+
   const getIndexColor = (index) => {
     if (index <= 25) return '#ef4444'; // red-500
     if (index <= 45) return '#f97316'; // orange-500
@@ -276,7 +296,7 @@ const FearGreedBettingApp = () => {
   };
 
   // 반원 게이지 컴포넌트
-  const SemicircleGauge = ({ value, size = 200 }) => {
+  const SemicircleGauge = ({ value, size = 280 }) => {
     const radius = size / 2 - 20;
     const centerX = size / 2;
     const centerY = size / 2 - 20; // 중심을 위로 이동 (위쪽 반원)
@@ -302,7 +322,7 @@ const FearGreedBettingApp = () => {
     const needleEnd = polarToCartesian(centerX, centerY, radius - 10, needleAngle);
     
     return (
-      <svg width={size} height={size / 2 + 60} style={{ overflow: 'visible' }}>
+      <svg width={size} height={size / 2 + 40} style={{ overflow: 'visible' }}>
         {/* 배경 반원 */}
         <path
           d={createArc(0, 180)}
@@ -332,18 +352,6 @@ const FearGreedBettingApp = () => {
         
         {/* 중심점 */}
         <circle cx={centerX} cy={centerY} r="6" fill="white" />
-        
-        {/* 숫자 표시 */}
-        <text
-          x={centerX}
-          y={centerY + 30}
-          textAnchor="middle"
-          fill="white"
-          fontSize="24"
-          fontWeight="bold"
-        >
-          {value}
-        </text>
       </svg>
     );
   };
@@ -421,12 +429,18 @@ const FearGreedBettingApp = () => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'space-between',
+              gap: '16px',
               fontSize: '14px',
               color: '#d1d5db'
             }}>
-              <Clock size={16} />
-              <span>Next update in {formatTime(timeLeft)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Clock size={16} />
+                <span>Ends in {formatTime(timeLeft)}</span>
+              </div>
+              <div style={{ fontSize: '14px', color: '#d1d5db' }}>
+                {formatCurrentTime(currentTime)}
+              </div>
             </div>
           </div>
 
@@ -466,17 +480,18 @@ const FearGreedBettingApp = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              marginBottom: '8px'
+              marginBottom: '16px'
             }}>
               <Activity size={20} color="#22d3ee" />
               <span style={{ fontSize: '18px', fontWeight: '600' }}>Current Index</span>
             </div>
             
             {/* 반원 게이지 */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-              <SemicircleGauge value={currentIndex} size={200} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+              <SemicircleGauge value={currentIndex} size={280} />
             </div>
             
+            {/* 인덱스 숫자와 라벨 */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
               <div style={{
                 fontSize: '48px',
@@ -492,51 +507,17 @@ const FearGreedBettingApp = () => {
               }}>
                 {getIndexLabel(currentIndex)}
               </div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '14px',
-                color: '#d1d5db'
-              }}>
-                {indexTrend === 'up' && <TrendingUp size={16} color="#22c55e" />}
-                {indexTrend === 'down' && <TrendingDown size={16} color="#ef4444" />}
-                <span>vs yesterday avg: {yesterdayAverage}</span>
-              </div>
             </div>
 
-            {/* 30-Day Trend 차트 (Current Index 섹션 내부) */}
+            {/* 차트 (Current Index 섹션 내부) */}
             {chartData.length > 0 && (
-              <div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginBottom: '16px'
-                }}>
-                  <Activity size={16} color="#22d3ee" />
-                  <span style={{ fontSize: '16px', fontWeight: '600' }}>30-Day Trend</span>
-                </div>
-                
-                <div style={{ height: '120px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ height: '120px', display: 'flex', justifyContent: 'center' }}>
+                  <ResponsiveContainer width="90%" height="100%">
                     <LineChart data={chartData}>
-                      <XAxis 
-                        dataKey="time" 
-                        axisLine={false} 
-                        tickLine={false}
-                        tick={{ fill: '#9ca3af', fontSize: 10 }}
-                      />
-                      <YAxis 
-                        domain={[0, 100]}
-                        axisLine={false} 
-                        tickLine={false}
-                        tick={{ fill: '#9ca3af', fontSize: 10 }}
-                      />
-                      <ReferenceLine y={25} stroke="#ef4444" strokeDasharray="3 3" />
-                      <ReferenceLine y={75} stroke="#22c55e" strokeDasharray="3 3" />
+                      <XAxis hide />
+                      <YAxis hide domain={[0, 100]} />
+                      <ReferenceLine y={yesterdayAverage} stroke="#fbbf24" strokeDasharray="3 3" strokeWidth={2} />
                       <Line 
                         type="monotone" 
                         dataKey="value" 
@@ -546,6 +527,21 @@ const FearGreedBettingApp = () => {
                       />
                     </LineChart>
                   </ResponsiveContainer>
+                </div>
+                
+                {/* vs yesterday avg */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontSize: '14px',
+                  color: '#d1d5db',
+                  marginTop: '12px'
+                }}>
+                  {indexTrend === 'up' && <TrendingUp size={16} color="#22c55e" />}
+                  {indexTrend === 'down' && <TrendingDown size={16} color="#ef4444" />}
+                  <span>vs yesterday avg: {yesterdayAverage}</span>
                 </div>
               </div>
             )}
